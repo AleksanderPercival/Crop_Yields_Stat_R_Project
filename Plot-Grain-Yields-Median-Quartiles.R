@@ -23,7 +23,7 @@ crops_data <- data.frame(
                   rep("lubusz", length(lubusz)))
 )
 
-# package inculsion
+# plot package inculsion
 
 if(!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2)
@@ -63,3 +63,92 @@ mean_sd_chart <- ggplot(crops_data, aes(x = Voivodeship, y = Crops, fill = Voivo
 
 print(mean_sd_chart)
 
+# HISTOGRAMS
+
+histograms_chart <- ggplot(crops_data, aes(x = Crops, fill = Voivodeship)) +
+  geom_histogram(binwidth = 0.5, color = "black", alpha = 0.7) +
+  facet_wrap(~Voivodeship, ncol = 1) + 
+  theme_minimal() +
+  labs(title = "Empirical Distributions of Grain Yields",
+       x = "Crops [t/ha]",
+       y = "Frequency (Count)") +
+  theme(legend.position = "none")
+
+print(histograms_chart)
+
+# moments package inclusion
+
+if(!require(moments)) install.packages("moments")
+library(moments)
+
+# MEASURES FOR RAW DATA
+
+calculate_metrics <- function(data_vector) {
+  c(
+    Mean = mean(data_vector),
+    Median = median(data_vector),
+    Variance = var(data_vector),
+    Std_Deviation = sd(data_vector),
+    Coef_Variation_pct = (sd(data_vector) / mean(data_vector)) * 100,
+    Skewness = skewness(data_vector),
+    Kurtosis = kurtosis(data_vector)
+  )
+}
+
+metrics_lowerSilesian <- calculate_metrics(lowerSilesian)
+metrics_lubusz <- calculate_metrics(lubusz)
+
+raw_data_results <- data.frame(
+  Metric = names(metrics_lowerSilesian),
+  LowerSilesian = round(metrics_lowerSilesian, 3),
+  Lubusz = round(metrics_lubusz, 3),
+  row.names = NULL
+)
+
+print(raw_data_results)
+
+# MEASURES FOR BINNED DATA
+
+calculate_binned_metrics <- function(data_vector, bin_width = 0.5) {
+  
+  min_val <- floor(min(data_vector))
+  max_val <- ceiling(max(data_vector))
+  breaks_seq <- seq(min_val, max_val, by = bin_width)
+  
+  h <- hist(data_vector, breaks = breaks_seq, plot = FALSE)
+  mids <- h$mids
+  counts <- h$counts
+  n <- sum(counts)
+  
+  b_mean <- sum(mids * counts) / n
+  
+  b_var <- sum(counts * (mids - b_mean)^2) / (n - 1) 
+  b_sd <- sqrt(b_var)
+  
+  m3 <- sum(counts * (mids - b_mean)^3) / n
+  m4 <- sum(counts * (mids - b_mean)^4) / n
+  
+  b_skewness <- m3 / (b_sd^3)
+  b_kurtosis <- m4 / (b_sd^4)
+  
+  c(
+    Mean = b_mean,
+    Variance = b_var,
+    Std_Deviation = b_sd,
+    Skewness = b_skewness,
+    Kurtosis = b_kurtosis
+  )
+}
+
+binned_lowerSilesian <- calculate_binned_metrics(lowerSilesian)
+binned_lubusz <- calculate_binned_metrics(lubusz)
+
+binned_data_results <- data.frame(
+  Metric = names(binned_lowerSilesian),
+  LowerSilesian = round(binned_lowerSilesian, 3),
+  Lubusz = round(binned_lubusz, 3),
+  row.names = NULL
+)
+
+cat("\n BINNED DATA METRICS \n")
+print(binned_data_results)
