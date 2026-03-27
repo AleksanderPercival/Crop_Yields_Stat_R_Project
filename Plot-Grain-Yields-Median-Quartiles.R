@@ -152,3 +152,121 @@ binned_data_results <- data.frame(
 
 cat("\n BINNED DATA METRICS \n")
 print(binned_data_results)
+
+# NORMALITY TEST (KOLMOGOROV-LILLIEFORS)
+
+if(!require(nortest)) install.packages("nortest")
+library(nortest)
+
+# Confidence level: 0.95 -> Alpha: 0.05
+# H0: Data follows a normal distribution
+# H1: Data does not follow a normal distribution
+# Decision rule: If p-value < 0.05, reject H0
+
+lillie_lowerSilesian <- lillie.test(lowerSilesian)
+lillie_lubusz <- lillie.test(lubusz)
+
+cat("\nLILLIEFORS TEST: LOWER SILESIAN \n")
+print(lillie_lowerSilesian)
+
+cat("\n LILLIEFORS TEST: LUBUSZ \n")
+print(lillie_lubusz)
+
+#Results:
+#data:  lowerSilesian - D = 0.084753, p-value = 0.526 -> p-value > 0.05
+#data:  lubusz - D = 0.083881, p-value = 0.5594 -> p-value > 0.05
+#Failed to reject H0 - normal distribution can be applied to data
+
+# PARAMETRIC HYPOTHESIS TESTING (MEAN)
+
+# Significance level (alpha): 0.05
+# H0: mu = 8.4
+# H1: mu != 8.4
+# Test type: Two-sided
+
+t_test_lowerSilesian <- t.test(lowerSilesian, 
+                               mu = 8.4, 
+                               alternative = "two.sided", 
+                               conf.level = 0.95)
+
+cat("\n ONE-SAMPLE T-TEST: LOWER SILESIAN \n")
+print(t_test_lowerSilesian)
+
+# Results:
+# t = -1.4497, df = 47, p-value = 0.1538 -> e (0.1538) > 0.05
+#Failed to reject H0 - the average yield in Lower Silesian doesn't differ significantly from 8.4 t/ha
+
+#PARAMETRIC HYPOTHESIS TESTING (STANDARD DEVIATION / VARIANCE)
+
+# Significance level (alpha): 0.05
+#Testing SD = 1.4 -> Variance = 1.96
+# H0: sigma^2 = 1.96
+# H1: sigma^2 != 1.96
+
+if(!require(EnvStats)) install.packages("EnvStats")
+library(EnvStats)
+
+null_sd <- 1.4
+null_variance <- null_sd^2
+
+variance_test_lubusz <- varTest(lubusz, 
+                                alternative = "two.sided", 
+                                conf.level = 0.95, 
+                                sigma.squared = null_variance)
+
+cat("\n CHI-SQUARE VARIANCE TEST: LUBUSZ \n")
+print(variance_test_lubusz)
+
+# Results:
+# Chi-Squared = 30.769, df = 46, p-value = 0.0826 -> 0.0826 > 0.05
+#Failed to reject H0 - standard deviation of yields in Lubusz doesn't differ significantly from 1.4
+
+# TWO-SAMPLE COMPARISON (WELCH T-TEST)
+
+# Significance level (alpha): 0.05
+# H0: mu_lubusz >= mu_lowerSilesian
+# H1: mu_lubusz < mu_lowerSilesian
+# Test type: One-sided (less)
+
+comparison_test <- t.test(x = lubusz, 
+                          y = lowerSilesian, 
+                          alternative = "less", 
+                          conf.level = 0.95)
+
+cat("\n TWO-SAMPLE WELCH T-TEST \n")
+print(comparison_test)
+
+# Results:
+# t = -0.4688324, df = 91.62844, p-value = 0.3201515 -> 0.3201515 > 0.05
+#Failed to reject H0 - Lubusz yields are not significantly lower than Lower Silesian yields
+
+#PERMUTATION TEST (RESAMPLING METHOD)
+
+obs_diff <- mean(lubusz) - mean(lowerSilesian)
+
+n_permutations <- 10000
+perm_diffs <- numeric(n_permutations)
+all_crops <- c(lubusz, lowerSilesian)
+n_lubusz <- length(lubusz)
+
+set.seed(42) 
+
+for(i in 1:n_permutations) {
+  shuffled_crops <- sample(all_crops)
+  
+  sim_lubusz <- shuffled_crops[1:n_lubusz]
+  sim_lowerSilesian <- shuffled_crops[(n_lubusz + 1):length(all_crops)]
+  
+  perm_diffs[i] <- mean(sim_lubusz) - mean(sim_lowerSilesian)
+}
+
+p_value_perm <- sum(perm_diffs <= obs_diff) / n_permutations
+
+cat("\n PERMUTATION TEST RESULTS \n")
+cat("Observed Difference:", obs_diff, "\n")
+cat("Permutation P-value:", p_value_perm, "\n")
+
+# Results:
+#Observed Difference: -0.105031
+#Permutation P-value: 0.3216
+# -0.105031 < 0.3216 -> Failed to reject H0 with permutation test as well
