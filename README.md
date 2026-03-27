@@ -1,7 +1,9 @@
 Project Overview
+
 This project involves a statistical analysis of triticale yields (measured in t/ha) across randomly selected farms in two Polish voivodeships: Lower Silesian (Dolnośląskie) and Lubusz (Lubuskie). The goal is to perform comprehensive data visualization, descriptive statistics, and hypothesis testing to compare agricultural productivity between these regions.
 
 Dataset Description
+
 Lower Silesian Voivodeship: Sample data includes yields from 48 farms.
 Lubusz Voivodeship: Sample data includes yields from 47 farms.
 
