@@ -1,38 +1,27 @@
-Project Overview
+# Triticale Yield Analysis - Statistical Project in R
 
-This project involves a statistical analysis of triticale yields (measured in t/ha) across randomly selected farms in two Polish voivodeships: Lower Silesian (Dolnośląskie) and Lubusz (Lubuskie). The goal is to perform comprehensive data visualization, descriptive statistics, and hypothesis testing to compare agricultural productivity between these regions.
+## Overview
+This project performs a comprehensive statistical analysis of triticale crop yields across two Polish regions (Lower Silesian and Lubusz). It was developed to demonstrate proficiency in statistical computing using R, data visualization, and hypothesis testing.
 
-Dataset Description
+## Tech Stack & Methodologies
+- **Language:** R
+- **Visualization:** `ggplot2` (Customized boxplots, faceted histograms)
+- **Normality Testing:** `nortest` (Lilliefors test)
+- **Advanced Stats:** `moments`, `EnvStats`
+- **Simulations:** Custom-built **Permutation Test** (Resampling)
+- **Version Control:** Git
 
-Lower Silesian Voivodeship: Sample data includes yields from 48 farms.
-Lubusz Voivodeship: Sample data includes yields from 47 farms.
+## Key Features
+- **Data Engineering:** Transformation of raw data into tidy data frames for automated pipelines.
+- **Statistical Measures:** Comparative analysis of raw vs. binned data, highlighting the "grouping error" phenomenon.
+- **Hypothesis Testing:**
+  - One-sample t-test (Mean verification).
+  - Chi-squared test (Standard deviation verification).
+  - Welch’s t-test (Inter-regional comparison).
+- **Brute-force Verification:** Implementation of a 10,000-iteration Permutation Test to validate parametric results.
 
-Project Requirements & Tasks
+## Visualizations
+*(Note: Visuals are documented in the full report. Key findings include left-skewed distributions and platykurtic tendencies in both regions.)*
 
-1. Data Visualization:
-Generate two types of box plots to present the data:
-Standard box plot showing median and quartiles.
-Custom box plot representing mean and standard deviation.
-
-3. Descriptive Statistics & Histograms:
-Analyze triticale yields by calculating key statistical measures, including:
-Central Tendency: Mean, Median.
-Dispersion: Variance, Standard Deviation, Coefficient of Variation.
-Shape: Skewness (asymmetry) and Kurtosis (concentration).
-Visual Analysis: Development of empirical distribution histograms.
-Methodology: Calculations performed using both raw data series and frequency distribution series.
-
-3. Normality Testing:
-Verify whether the yields follow a normal distribution using the Kolmogorov-Lilliefors test with a confidence level of 0.95 ($\alpha = 0.05$).
-
-4. One-Sample Mean Test:
-At a significance level of 0.05, test the hypothesis: Is the average yield in the Lower Silesian voivodeship equal to 8.4 t/ha?
-
-5. One-Sample Variance Test:
-At a significance level of 0.05, test the hypothesis: Is the standard deviation of yields in the Lubusz voivodeship equal to 1.4?
-
-6. Two-Sample Comparison (Directional Test):
-Formulate and verify a hypothesis at $\alpha = 0.05$ to determine if yields in the Lubusz voivodeship are significantly lower than those in the Lower Silesian voivodeship.
-
-7. Permutation Testing:
-Develop and implement a permutation test to verify the findings from the two-sample comparison in Task 6.
+## Conclusion
+The analysis proved that observed differences between regions are statistically insignificant (p > 0.05), showcasing a data-driven approach to agricultural research.
